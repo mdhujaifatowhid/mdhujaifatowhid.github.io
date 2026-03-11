@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hujaifa Towhid — AI Chatbot Developer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --ink:     #0f1117;
+      --soft:    #f7f8fc;
+      --muted:   #6b7280;
+      --accent:  #2563eb;
+      --accent2: #7c3aed;
+      --border:  #e5e7eb;
+      --card:    #ffffff;
+      --grad: linear-gradient(135deg, #2563eb, #7c3aed);
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--soft);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    /* ── CURSOR ── */
+    .cursor {
+      width: 10px; height: 10px;
+      background: var(--accent);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.15s ease;
+      mix-blend-mode: multiply;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      background: rgba(247,248,252,0.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      z-index: 1000;
+      padding: 0 5%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 80px 8% 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 80% 40%, rgba(37,99,235,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 20% 70%, rgba(124,58,237,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 60px 60px;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+    .hero-content { position: relative; max-width: 700px; }
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 0.78rem;
+      color: var(--accent);
+      font-weight: 500;
+      margin-bottom: 28px;
+      box-shadow: 0 2px 8px rgba(37,99,235,0.08);
+      animation: fadeUp 0.6s ease both;
+    }
+    .hero-tag::before {
+      content: '';
+      width: 7px; height: 7px;
+      background: #22c55e;
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3rem, 7vw, 5.5rem);
+      font-weight: 700;
+      line-height: 1.05;
+      color: var(--ink);
+      margin-bottom: 24px;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+    h1 em {
+      font-style: normal;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: 1.1rem;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 520px;
+      margin-bottom: 40px;
+      font-weight: 300;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+    .hero-btns {
+      display: flex; gap: 14px; flex-wrap: wrap;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+    .btn-primary {
+      background: var(--grad);
+      color: #fff;
+      padding: 13px 28px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(37,99,235,0.3);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(37,99,235,0.35); }
+    .btn-outline {
+      background: #fff;
+      color: var(--ink);
+      padding: 13px 28px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border: 1.5px solid var(--border);
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .btn-outline:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+    .hero-stats {
+      display: flex; gap: 40px; margin-top: 56px;
+      animation: fadeUp 0.6s 0.4s ease both;
+    }
+    .stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+    }
+    .stat-label { font-size: 0.78rem; color: var(--muted); margin-top: 4px; font-weight: 400; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── SECTIONS ── */
+    section { padding: 96px 8%; }
+    .section-tag {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 16px;
+      line-height: 1.15;
+    }
+    .section-sub {
+      font-size: 1rem;
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.7;
+      font-weight: 300;
+    }
+    .section-header { margin-bottom: 56px; }
+
+    /* ── SKILLS ── */
+    #skills { background: #fff; }
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .skill-card {
+      background: var(--soft);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 24px;
+      transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+    .skill-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--grad);
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+    .skill-card:hover { border-color: transparent; transform: translateY(-4px); box-shadow: 0 12px 40px rgba(37,99,235,0.1); }
+    .skill-card:hover::before { opacity: 1; }
+    .skill-icon { font-size: 2rem; margin-bottom: 14px; }
+    .skill-name { font-weight: 600; font-size: 1rem; margin-bottom: 6px; }
+    .skill-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── PROJECTS ── */
+    #projects { background: var(--soft); }
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+    .project-card {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .project-card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0,0,0,0.08); }
+    .project-thumb {
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .project-body { padding: 24px; }
+    .project-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .tag {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      padding: 4px 10px;
+      border-radius: 100px;
+      background: rgba(37,99,235,0.08);
+      color: var(--accent);
+    }
+    .project-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .project-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.65; margin-bottom: 20px; }
+    .project-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+      transition: gap 0.2s;
+    }
+    .project-link:hover { gap: 10px; }
+
+    /* ── PRICING ── */
+    #pricing { background: #fff; }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      max-width: 900px;
+    }
+    .pricing-card {
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      padding: 36px 28px;
+      background: var(--soft);
+      position: relative;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .pricing-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.07); }
+    .pricing-card.featured {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: #fff;
+    }
+    .pricing-card.featured .pricing-sub,
+    .pricing-card.featured .pricing-feature { color: rgba(255,255,255,0.6); }
+    .featured-badge {
+      position: absolute;
+      top: -13px; left: 50%; transform: translateX(-50%);
+      background: var(--grad);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 5px 16px;
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+    .pricing-plan { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+    .pricing-card.featured .pricing-plan { color: rgba(255,255,255,0.5); }
+    .pricing-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3rem;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .pricing-sub { font-size: 0.82rem; color: var(--muted); margin-bottom: 24px; }
+    .pricing-features { list-style: none; margin-bottom: 28px; display: flex; flex-direction: column; gap: 10px; }
+    .pricing-feature { font-size: 0.85rem; color: var(--muted); display: flex; gap: 8px; align-items: flex-start; }
+    .pricing-feature::before { content: '✓'; color: var(--accent); font-weight: 700; flex-shrink: 0; }
+    .pricing-card.featured .pricing-feature::before { color: #818cf8; }
+    .pricing-btn {
+      display: block;
+      text-align: center;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+      background: var(--grad);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(37,99,235,0.25);
+    }
+    .pricing-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(37,99,235,0.35); }
+    .pricing-card:not(.featured) .pricing-btn {
+      background: #fff;
+      color: var(--ink);
+      box-shadow: none;
+      border: 1.5px solid var(--border);
+    }
+    .pricing-card:not(.featured) .pricing-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── CONTACT ── */
+    #contact {
+      background: var(--ink);
+      color: #fff;
+      text-align: center;
+    }
+    #contact .section-title { color: #fff; }
+    #contact .section-sub { color: rgba(255,255,255,0.5); margin: 0 auto 40px; }
+    .contact-links { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+    .contact-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      border: 1.5px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.8);
+    }
+    .contact-link:hover { background: rgba(255,255,255,0.08); color: #fff; border-color: rgba(255,255,255,0.3); }
+    .contact-link.primary {
+      background: var(--grad);
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(37,99,235,0.4);
+    }
+    .contact-link.primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(37,99,235,0.5); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #080b12;
+      color: rgba(255,255,255,0.3);
+      text-align: center;
+      padding: 24px;
+      font-size: 0.78rem;
+    }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 640px) {
+      section { padding: 72px 6%; }
+      .hero-stats { gap: 24px; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Hujaifa Towhid</div>
+  <ul class="nav-links">
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-tag">Available for freelance work</div>
+    <h1>I build <em>AI Chatbots</em> for your business</h1>
+    <p class="hero-sub">Custom AI-powered chatbots that talk to your customers 24/7 — in Bangla & English. Fast, secure, and easy to embed on any website.</p>
+    <div class="hero-btns">
+      <a href="#projects" class="btn-primary">View My Work →</a>
+      <a href="#pricing" class="btn-outline">See Pricing</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">3+</div>
+        <div class="stat-label">Projects Built</div>
+      </div>
+      <div>
+        <div class="stat-num">24h</div>
+        <div class="stat-label">Delivery Time</div>
+      </div>
+      <div>
+        <div class="stat-num">100%</div>
+        <div class="stat-label">Secure & Live</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-header reveal">
+    <div class="section-tag">What I Use</div>
+    <h2 class="section-title">Skills & Technologies</h2>
+    <p class="section-sub">Modern tools to build fast, reliable, and intelligent chatbots for any business.</p>
+  </div>
+  <div class="skills-grid">
+    <div class="skill-card reveal">
+      <div class="skill-icon">🐍</div>
+      <div class="skill-name">Python & Flask</div>
+      <div class="skill-desc">Backend API development with secure server-side logic.</div>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">🤖</div>
+      <div class="skill-name">AI Integration</div>
+      <div class="skill-desc">Groq, OpenAI, Gemini, and Anthropic APIs for smart conversations.</div>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">🎨</div>
+      <div class="skill-name">HTML / CSS / JS</div>
+      <div class="skill-desc">Beautiful, responsive chat UIs that work on all devices.</div>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">🚀</div>
+      <div class="skill-name">Cloud Deployment</div>
+      <div class="skill-desc">Railway, Render & GitHub Pages — live in minutes.</div>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">🔐</div>
+      <div class="skill-name">Secure Architecture</div>
+      <div class="skill-desc">API keys hidden server-side. No exposure to the client.</div>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">🌐</div>
+      <div class="skill-name">Easy Embed</div>
+      <div class="skill-desc">1-line script tag. Works on WordPress, Blogger, Wix & more.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-header reveal">
+    <div class="section-tag">My Work</div>
+    <h2 class="section-title">Projects</h2>
+    <p class="section-sub">Real chatbots I've built and deployed for businesses.</p>
+  </div>
+  <div class="projects-grid">
+
+    <div class="project-card reveal">
+      <div class="project-thumb" style="background: linear-gradient(135deg,#fff8f0,#fde8e0);">🍔</div>
+      <div class="project-body">
+        <div class="project-tags">
+          <span class="tag">Restaurant</span>
+          <span class="tag">Bangla + English</span>
+          <span class="tag">Live</span>
+        </div>
+        <div class="project-name">Food Heaven Chatbot</div>
+        <p class="project-desc">AI-powered chatbot for a restaurant in Rangpur. Handles menu queries, delivery info, and order collection — in both Bangla and English.</p>
+        <a href="https://web-production-3b39a.up.railway.app" target="_blank" class="project-link">Live Demo →</a>
+      </div>
+    </div>
+
+    <div class="project-card reveal">
+      <div class="project-thumb" style="background: linear-gradient(135deg,#f0f7ff,#dbeafe);">🏠</div>
+      <div class="project-body">
+        <div class="project-tags">
+          <span class="tag">Real Estate</span>
+          <span class="tag">Coming Soon</span>
+        </div>
+        <div class="project-name">Real Estate Chatbot</div>
+        <p class="project-desc">A smart chatbot for property agencies — answers queries about listings, pricing, and schedules property visits automatically.</p>
+        <a href="#contact" class="project-link">Request Demo →</a>
+      </div>
+    </div>
+
+    <div class="project-card reveal">
+      <div class="project-thumb" style="background: linear-gradient(135deg,#f0fdf4,#dcfce7);">🛒</div>
+      <div class="project-body">
+        <div class="project-tags">
+          <span class="tag">E-commerce</span>
+          <span class="tag">Coming Soon</span>
+        </div>
+        <div class="project-name">E-commerce Support Bot</div>
+        <p class="project-desc">Handles order tracking, product queries, return policies, and customer support for online shops — 24/7 without human intervention.</p>
+        <a href="#contact" class="project-link">Request Demo →</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-header reveal">
+    <div class="section-tag">Packages</div>
+    <h2 class="section-title">Simple Pricing</h2>
+    <p class="section-sub">Choose the right package for your business. All include a live, working chatbot.</p>
+  </div>
+  <div class="pricing-grid reveal">
+
+    <div class="pricing-card">
+      <div class="pricing-plan">Basic</div>
+      <div class="pricing-price">$30</div>
+      <div class="pricing-sub">One-time payment</div>
+      <ul class="pricing-features">
+        <li class="pricing-feature">Custom AI chatbot</li>
+        <li class="pricing-feature">Menu / info setup</li>
+        <li class="pricing-feature">Live hosted link</li>
+        <li class="pricing-feature">Bangla + English</li>
+        <li class="pricing-feature">3-day delivery</li>
+      </ul>
+      <a href="https://www.fiverr.com" target="_blank" class="pricing-btn">Order on Fiverr</a>
+    </div>
+
+    <div class="pricing-card featured">
+      <div class="featured-badge">⭐ Most Popular</div>
+      <div class="pricing-plan">Standard</div>
+      <div class="pricing-price">$80</div>
+      <div class="pricing-sub">One-time payment</div>
+      <ul class="pricing-features">
+        <li class="pricing-feature">Everything in Basic</li>
+        <li class="pricing-feature">Website embed widget</li>
+        <li class="pricing-feature">Custom personality & tone</li>
+        <li class="pricing-feature">Mobile responsive UI</li>
+        <li class="pricing-feature">2-day delivery</li>
+      </ul>
+      <a href="https://www.fiverr.com" target="_blank" class="pricing-btn">Order on Fiverr</a>
+    </div>
+
+    <div class="pricing-card">
+      <div class="pricing-plan">Premium</div>
+      <div class="pricing-price">$150</div>
+      <div class="pricing-sub">One-time + $5/mo hosting</div>
+      <ul class="pricing-features">
+        <li class="pricing-feature">Everything in Standard</li>
+        <li class="pricing-feature">I handle full deployment</li>
+        <li class="pricing-feature">1 month free maintenance</li>
+        <li class="pricing-feature">Unlimited revisions</li>
+        <li class="pricing-feature">1-day delivery</li>
+      </ul>
+      <a href="https://www.fiverr.com" target="_blank" class="pricing-btn">Order on Fiverr</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-tag" style="color:rgba(255,255,255,0.4)">Get In Touch</div>
+  <h2 class="section-title">Let's build your chatbot</h2>
+  <p class="section-sub">Have a project in mind? Reach out and I'll get back to you within 24 hours.</p>
+  <div class="contact-links">
+    <a href="https://www.fiverr.com" target="_blank" class="contact-link primary">🛒 Order on Fiverr</a>
+    <a href="https://github.com/mdhujaifatowhid" target="_blank" class="contact-link">💻 GitHub</a>
+    <a href="https://www.facebook.com/md.hujaifa.towhid" target="_blank" class="contact-link">🔗 Facebook</a>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 Hujaifa Towhid — AI Chatbot Developer · Built with ❤️ in Bangladesh</p>
+</footer>
+
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX - 5 + 'px';
+    cursor.style.top  = e.clientY - 5 + 'px';
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
