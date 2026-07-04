@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mdhujaifatowhid.github.io/sitemap.xml
